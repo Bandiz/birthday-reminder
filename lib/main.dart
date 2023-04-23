@@ -2,6 +2,9 @@ import 'package:birthday_reminder/day_events.dart';
 import 'package:birthday_reminder/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:provider/provider.dart';
+
+import 'calendar_state.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final kToday = DateTime.now();
@@ -21,7 +24,10 @@ void main() async {
   //     android: initializationSettingsAndroid,
   //     iOS: initializationSettingsDarwin);
   // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  runApp(const BirthdayReminderApp());
+  runApp(
+    ChangeNotifierProvider(
+        create: (_) => CalendarState(), child: const BirthdayReminderApp()),
+  );
 }
 
 class BirthdayReminderApp extends StatelessWidget {
