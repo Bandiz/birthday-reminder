@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import 'calendar_state.dart';
 
@@ -17,7 +17,7 @@ class DayEvents extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Selected Date: ${DateFormat("yyyy-MM-dd").format(currentDate).toString()}'),
+            'Selected Date: ${DateFormat("yyyy-MM-dd").format(currentDate)}'),
       ),
       body: Center(
         child: Expanded(
@@ -32,15 +32,9 @@ class DayEvents extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(12.0),
-                  // color: value[index].isSelected ? Colors.red : null
                 ),
                 child: ListTile(
-                  onTap: () {
-                    calendarState.toggleEvent(currentDate, index);
-                    // setState(() {
-                    //   value[index].isSelected = !value[index].isSelected;
-                    // });
-                  },
+                  onTap: () => calendarState.toggleEvent(currentDate, index),
                   title: Text('${events[index]}'),
                   selected: events[index].isSelected,
                 ),
@@ -49,6 +43,39 @@ class DayEvents extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            final controller = TextEditingController();
+            await showDialog<void>(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text("Enter new event"),
+                      content: TextField(
+                        controller: controller,
+                      ),
+                      actions: [
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Save'),
+                          onPressed: () {
+                            if (controller.text.isEmpty) {
+                              return;
+                            }
+                            calendarState.addEvent(
+                                currentDate, controller.text);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                barrierDismissible: true);
+          },
+          child: const Icon(Icons.add)),
     );
   }
 }

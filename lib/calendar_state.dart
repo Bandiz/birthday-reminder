@@ -20,4 +20,12 @@ class CalendarState extends ChangeNotifier {
     events[index].isSelected = !events[index].isSelected;
     notifyListeners();
   }
+
+  void addEvent(DateTime date, String title) {
+    final events = _dateEvents[date] ?? [];
+
+    events.add(Event(title: title, date: date));
+    _dateEvents[date] = events;
+    notifyListeners();
+  }
 }
