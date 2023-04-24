@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DayEvents(events, currentDate: selectedDay),
+        builder: (context) => DayEvents(currentDate: selectedDay),
       ),
     );
   }
