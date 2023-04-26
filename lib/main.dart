@@ -1,33 +1,84 @@
-import 'package:birthday_reminder/day_events.dart';
-import 'package:birthday_reminder/utils.dart';
+import 'package:cron/cron.dart';
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'calendar_state.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'day_events.dart';
+import 'utils.dart';
 
 final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year, 1, 31);
 final kLastDay = DateTime(kToday.year, 12, 31);
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  final Cron cron = Cron();
+  final CalendarState state = CalendarState();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  //     FlutterLocalNotificationsPlugin();
-  // const AndroidInitializationSettings initializationSettingsAndroid =
-  //     AndroidInitializationSettings('@mipmap/ic_launcher');
-  // const DarwinInitializationSettings initializationSettingsDarwin =
-  //     DarwinInitializationSettings();
-  // const InitializationSettings initializationSettings = InitializationSettings(
-  //     android: initializationSettingsAndroid,
-  //     iOS: initializationSettingsDarwin);
-  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await initializeNotifications();
+  tz.initializeTimeZones();
+  await scheduleReminders(state);
+
+  cron.schedule(Schedule.parse('0 8 1 * *'), () async {
+    await scheduleReminders(state);
+  });
+
   runApp(
     ChangeNotifierProvider(
-        create: (_) => CalendarState(), child: const BirthdayReminderApp()),
+        create: (_) => state, child: const BirthdayReminderApp()),
   );
+}
+
+Future<void> scheduleReminders(CalendarState state) async {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails('monthly_notification', 'Monthly Notification',
+          channelDescription: 'Scheduled monthly notification',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker');
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  final events = state.getEvents(DateTime.now());
+
+  for (Event event in events) {
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        event.id,
+        event.title,
+        'This is your birthday reminder',
+        _nextInstanceOfFirstDayOfTheMonth(),
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime);
+  }
+}
+
+tz.TZDateTime _nextInstanceOfFirstDayOfTheMonth() {
+  final local = tz.getLocation("Europe/Stockholm");
+  final now = tz.TZDateTime.now(local);
+  final nextMonth = DateTime(
+      now.year, now.month, now.day, now.hour, now.minute, now.second + 10);
+  return tz.TZDateTime.from(nextMonth, tz.local);
+}
+
+Future<bool?> initializeNotifications() async {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings();
+  const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin);
+  return flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
 class BirthdayReminderApp extends StatelessWidget {

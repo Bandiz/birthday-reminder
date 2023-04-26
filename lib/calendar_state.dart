@@ -30,8 +30,10 @@ class CalendarState extends ChangeNotifier {
 
   void addEvent(DateTime date, String title) {
     final events = _dateEvents[date] ?? [];
+    final id =
+        events.fold(0, (curr, next) => curr < next.id ? next.id : curr) + 1;
 
-    events.add(Event(title: title, date: date));
+    events.add(Event(id: id, title: title, date: date));
     _dateEvents[date] = events;
     notifyListeners();
   }
@@ -45,7 +47,8 @@ class CalendarState extends ChangeNotifier {
   void updateEvent(DateTime date, Event event, String title) {
     final events = _dateEvents[date] ?? [];
     final index = events.indexOf(event);
-    events.replaceRange(index, index + 1, [Event(date: date, title: title)]);
+    events.replaceRange(
+        index, index + 1, [Event(id: event.id, date: date, title: title)]);
     notifyListeners();
   }
 }
