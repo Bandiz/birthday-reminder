@@ -10,7 +10,7 @@ import 'calendar_state.dart';
 import 'day_events.dart';
 import 'utils.dart';
 
-final kToday = DateTime.now();
+final kToday = DateTime.now().toUtc();
 final kFirstDay = DateTime(kToday.year, 1, 31);
 final kLastDay = DateTime(kToday.year, 12, 31);
 
@@ -45,27 +45,32 @@ Future<void> scheduleReminders(CalendarState state) async {
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
-  final events = state.getEvents(DateTime.now());
-
-  for (Event event in events) {
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        event.id,
-        event.title,
-        'This is your birthday reminder',
-        _nextInstanceOfFirstDayOfTheMonth(),
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
-  }
-}
-
-tz.TZDateTime _nextInstanceOfFirstDayOfTheMonth() {
+  final futureEventsDates = state.futureEventDates;
   final local = tz.getLocation("Europe/Stockholm");
-  final now = tz.TZDateTime.now(local);
-  final nextMonth = DateTime(
-      now.year, now.month, now.day, now.hour, now.minute, now.second + 10);
-  return tz.TZDateTime.from(nextMonth, tz.local);
+
+  await flutterLocalNotificationsPlugin.cancelAll();
+
+  for (DateTime eventDate in futureEventsDates) {
+    int delay = 0;
+    for (Event event in state.getEvents(eventDate)) {
+      DateTime notificationTime = DateTime(
+          event.date.year, event.date.month, event.date.day, 10, 0, delay++);
+
+      if (notificationTime.isBefore(DateTime.now())) {
+        notificationTime = DateTime.now().add(Duration(seconds: 10 + delay++));
+      }
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          event.id,
+          event.title,
+          'This is your birthday reminder',
+          tz.TZDateTime.from(notificationTime, local),
+          platformChannelSpecifics,
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
+    }
+  }
 }
 
 Future<bool?> initializeNotifications() async {

@@ -10,6 +10,15 @@ class CalendarState extends ChangeNotifier {
     _dateEvents = kEvents;
   }
 
+  List<DateTime> get futureEventDates {
+    final dateNow = DateTime.now();
+    final thisMonthEventDates = _dateEvents.keys
+        .where((x) => (x.month == dateNow.month && x.day >= dateNow.day))
+        .toList();
+
+    return List.unmodifiable(thisMonthEventDates);
+  }
+
   List<Event> getEvents(DateTime date) =>
       List.unmodifiable(_dateEvents[date] ?? []);
 
