@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'calendar_state.dart';
-import 'utils.dart';
 
 class DayEvents extends StatelessWidget {
   final DateTime currentDate;
@@ -13,9 +11,8 @@ class DayEvents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final calendarState = Provider.of<CalendarState>(context, listen: true);
+    final calendarState = context.watch<CalendarState>();
     final events = calendarState.getEvents(currentDate);
-    final isSelected = events.any((x) => (x.isSelected));
 
     return Scaffold(
         appBar: AppBar(
@@ -81,7 +78,6 @@ class DayEvents extends StatelessWidget {
                       );
                     },
                     title: Text('${events[index]}'),
-                    selected: events[index].isSelected,
                   ),
                 );
               },

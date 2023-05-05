@@ -2,25 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:collection';
-
 import 'package:table_calendar/table_calendar.dart';
 
-/// Example event class.
-class Event {
-  final int id;
-  final String title;
-  final DateTime date;
-  bool isSelected;
-
-  Event(
-      {required this.id,
-      required this.title,
-      required this.date,
-      this.isSelected = false});
-
-  @override
-  String toString() => title;
-}
+import 'models/event.dart';
 
 /// Example events.
 ///
