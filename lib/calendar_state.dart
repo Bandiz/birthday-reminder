@@ -1,13 +1,22 @@
 import 'dart:collection';
-import 'package:flutter/foundation.dart';
 
-import 'utils.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
+
+import 'models/event.dart';
 
 class CalendarState extends ChangeNotifier {
-  late final LinkedHashMap<DateTime, List<Event>> _dateEvents;
+  late final Box<Event> _eventsBox;
+  late final LinkedHashMap<DateTime, List<Event>> _dateEvents =
+      LinkedHashMap<DateTime, List<Event>>();
 
-  CalendarState() {
-    _dateEvents = kEvents;
+  CalendarState(Box<Event> eventsBox) {
+    _eventsBox = eventsBox;
+
+    for (final Event event in _eventsBox.values) {
+      _dateEvents.putIfAbsent(event.date, () => <Event>[]);
+      _dateEvents[event.date]?.add(event);
+    }
   }
 
   List<DateTime> get futureEventDates {
@@ -22,28 +31,16 @@ class CalendarState extends ChangeNotifier {
   List<Event> getEvents(DateTime date) =>
       List.unmodifiable(_dateEvents[date] ?? []);
 
-  void toggleEvent(DateTime date, int index) {
-    final events = _dateEvents[date];
-
-    if (events == null) return;
-
-    final event = events[index];
-
-    for (var element in events.where((x) => x.isSelected && x != event)) {
-      element.isSelected = false;
-    }
-
-    event.isSelected = !event.isSelected;
-    notifyListeners();
-  }
-
   void addEvent(DateTime date, String title) {
     final events = _dateEvents[date] ?? [];
     final id =
         events.fold(0, (curr, next) => curr < next.id ? next.id : curr) + 1;
-
-    events.add(Event(id: id, title: title, date: date));
+    final normalizedDay = DateTime.utc(date.year, date.month, date.day);
+    final newEvent = Event(id: id, title: title, date: normalizedDay);
+    events.add(newEvent);
     _dateEvents[date] = events;
+
+    _eventsBox.add(newEvent);
     notifyListeners();
   }
 
