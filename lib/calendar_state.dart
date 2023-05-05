@@ -13,9 +13,12 @@ class CalendarState extends ChangeNotifier {
   CalendarState(Box<Event> eventsBox) {
     _eventsBox = eventsBox;
 
+    int year = DateTime.now().year;
+
     for (final Event event in _eventsBox.values) {
-      _dateEvents.putIfAbsent(event.date, () => <Event>[]);
-      _dateEvents[event.date]?.add(event);
+      DateTime key = DateTime(year, event.date.month, event.date.day);
+      _dateEvents.putIfAbsent(key, () => <Event>[]);
+      _dateEvents[key]!.add(event);
     }
   }
 

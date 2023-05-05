@@ -217,6 +217,7 @@ class _HomePageState extends State<HomePage> {
                     TextButton(
                       child: const Text('Cancel'),
                       onPressed: () {
+                        controller.dispose();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -229,6 +230,8 @@ class _HomePageState extends State<HomePage> {
                         context
                             .read<CalendarState>()
                             .addEvent(_focusedDay, controller.text);
+
+                        controller.dispose();
                         Navigator.of(context).pop();
                       },
                     ),
