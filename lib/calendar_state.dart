@@ -16,7 +16,7 @@ class CalendarState extends ChangeNotifier {
     int year = DateTime.now().year;
 
     for (final Event event in _eventsBox.values) {
-      DateTime key = DateTime(year, event.date.month, event.date.day);
+      DateTime key = DateTime.utc(year, event.date.month, event.date.day);
       _dateEvents.putIfAbsent(key, () => <Event>[]);
       _dateEvents[key]!.add(event);
     }
@@ -35,15 +35,16 @@ class CalendarState extends ChangeNotifier {
       List.unmodifiable(_dateEvents[date] ?? []);
 
   void addEvent(DateTime date, String title) {
-    final events = _dateEvents[date] ?? [];
+    final normalizedDay = DateTime.utc(date.year, date.month, date.day);
+    final events = _dateEvents[normalizedDay] ?? [];
     final id =
         events.fold(0, (curr, next) => curr < next.id ? next.id : curr) + 1;
-    final normalizedDay = DateTime.utc(date.year, date.month, date.day);
     final newEvent = Event(id: id, title: title, date: normalizedDay);
     events.add(newEvent);
-    _dateEvents[date] = events;
+    _dateEvents[normalizedDay] = events;
 
     _eventsBox.add(newEvent);
+    newEvent.save();
     notifyListeners();
   }
 
@@ -58,6 +59,12 @@ class CalendarState extends ChangeNotifier {
     final index = events.indexOf(event);
     events.replaceRange(
         index, index + 1, [Event(id: event.id, date: date, title: title)]);
+    notifyListeners();
+  }
+
+  void clear() {
+    _dateEvents.clear();
+    _eventsBox.clear();
     notifyListeners();
   }
 }
