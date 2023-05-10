@@ -10,10 +10,6 @@ import 'calendar_state.dart';
 import 'models/event.dart';
 import 'pages/home_page.dart';
 
-final kToday = DateTime.now().toUtc();
-final kFirstDay = DateTime(kToday.year, 1, 31);
-final kLastDay = DateTime(kToday.year, 12, 31);
-
 void main() async {
   Hive.registerAdapter(EventAdapter());
   await Hive.initFlutter();

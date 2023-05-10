@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -49,12 +50,16 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             title: Text(widget.title),
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  state.clear();
-                },
-              )
+              ...(kDebugMode
+                  ? [
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          state.clear();
+                        },
+                      )
+                    ]
+                  : [])
             ],
           ),
           body: Column(
