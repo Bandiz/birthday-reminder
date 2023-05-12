@@ -4,17 +4,15 @@ import 'package:intl/intl.dart';
 
 import '../calendar_state.dart';
 
-class NewEventPage extends StatefulWidget {
-  final String _title = 'New event';
-  final DateTime focusedDate;
-
-  const NewEventPage({super.key, required this.focusedDate});
+class EditEventPage extends StatefulWidget {
+  final String _title = 'Edit event';
+  const EditEventPage({super.key});
 
   @override
-  State<NewEventPage> createState() => _NewEventPageState();
+  State<EditEventPage> createState() => _EditEventPageState();
 }
 
-class _NewEventPageState extends State<NewEventPage> {
+class _EditEventPageState extends State<EditEventPage> {
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String? _dateErrorText;
@@ -24,9 +22,9 @@ class _NewEventPageState extends State<NewEventPage> {
       context: context,
       initialEntryMode: DatePickerEntryMode.input,
       initialDatePickerMode: DatePickerMode.year,
-      initialDate: widget.focusedDate,
+      initialDate: DateTime.now(),
       firstDate: DateTime.utc(1900, 1, 1),
-      lastDate: widget.focusedDate,
+      lastDate: DateTime.now(),
     );
     if (picked != null) {
       _dateController.text = DateFormat('yyyy-MM-dd').format(picked);

@@ -6,6 +6,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../calendar_state.dart';
 import '../models/event.dart';
 import '../utils.dart';
+import 'edit_event_page.dart';
 import 'new_event_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -92,12 +93,22 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 2, horizontal: 8),
                                 child: ListTile(
-                                    title: Text(events[index].title),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(
-                                          color: Colors.black, width: 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    )));
+                                  title: Text(events[index].title),
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                        color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const EditEventPage(),
+                                      ),
+                                    );
+                                  },
+                                ));
                           })))
             ],
           ),
@@ -106,7 +117,8 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NewEventPage(),
+                    builder: (context) =>
+                        NewEventPage(focusedDate: _focusedDay),
                   ),
                 );
               },
