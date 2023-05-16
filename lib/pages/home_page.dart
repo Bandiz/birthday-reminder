@@ -5,7 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../calendar_state.dart';
 import '../models/event.dart';
-import '../utils.dart';
+import '../constants.dart';
 import 'edit_event_page.dart';
 import 'new_event_page.dart';
 
@@ -83,33 +83,30 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               Expanded(
-                  child: SizedBox(
-                      height: double.infinity,
-                      width: double.infinity,
-                      child: ListView.builder(
-                          itemCount: events.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 2, horizontal: 8),
-                                child: ListTile(
-                                  title: Text(events[index].title),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        color: Colors.black, width: 1),
-                                    borderRadius: BorderRadius.circular(5),
+                  child: ListView.builder(
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 2, horizontal: 8),
+                            child: ListTile(
+                              title: Text(events[index].title),
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                    color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditEventPage(
+                                        eventId: events[index].id),
                                   ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const EditEventPage(),
-                                      ),
-                                    );
-                                  },
-                                ));
-                          })))
+                                );
+                              },
+                            ));
+                      }))
             ],
           ),
           floatingActionButton: FloatingActionButton(

@@ -6,15 +6,16 @@ import '../calendar_state.dart';
 
 class EditEventPage extends StatefulWidget {
   final String _title = 'Edit event';
-  const EditEventPage({super.key});
+  final int eventId;
+  const EditEventPage({super.key, required this.eventId});
 
   @override
   State<EditEventPage> createState() => _EditEventPageState();
 }
 
 class _EditEventPageState extends State<EditEventPage> {
-  final TextEditingController _controller = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
+  late final TextEditingController _controller;
+  late final TextEditingController _dateController;
   String? _dateErrorText;
 
   Future<void> _onDateIconTap() async {
@@ -53,54 +54,64 @@ class _EditEventPageState extends State<EditEventPage> {
   void _onSavePressed() {
     if (_controller.text.isEmpty ||
         _dateController.text.isEmpty ||
-        DateTime.tryParse(_dateController.text) == null) {
+        _dateErrorText != null) {
       return;
     }
-    context
-        .read<CalendarState>()
-        .addEvent(DateTime.parse(_dateController.text), _controller.text);
+    context.read<CalendarState>().updateEvent(
+        widget.eventId, _controller.text, DateTime.parse(_dateController.text));
 
     Navigator.of(context).pop();
   }
 
   @override
+  void initState() {
+    super.initState();
+    final event = context.read<CalendarState>().getEvent(widget.eventId);
+    _controller = TextEditingController(text: event.title);
+    _dateController = TextEditingController(
+        text: DateFormat("yyyy-MM-dd").format(event.date));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget._title),
-      ),
-      body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: _dateController,
-                keyboardType: TextInputType.datetime,
-                decoration: InputDecoration(
-                  labelText: 'Birthday date',
-                  hintText: 'yyyy-MM-dd',
-                  errorText: _dateErrorText,
-                  prefixIcon: InkWell(
-                    onTap: _onDateIconTap,
-                    child: const Icon(Icons.calendar_today),
+    return Consumer<CalendarState>(builder: (context, state, child) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget._title),
+        ),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: _dateController,
+                  keyboardType: TextInputType.datetime,
+                  decoration: InputDecoration(
+                    labelText: 'Birthday date',
+                    hintText: '1999-01-07',
+                    errorText: _dateErrorText,
+                    prefixIcon: InkWell(
+                      onTap: _onDateIconTap,
+                      child: const Icon(Icons.calendar_today),
+                    ),
+                  ),
+                  onChanged: _onDateChanged,
+                ),
+                TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    labelText: "Event name",
                   ),
                 ),
-                onChanged: _onDateChanged,
-              ),
-              TextField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  labelText: "Enter name",
+                TextButton(
+                  onPressed: _onSavePressed,
+                  child: const Text('Save'),
                 ),
-              ),
-              TextButton(
-                onPressed: _onSavePressed,
-                child: const Text('Save'),
-              ),
-            ],
-          )),
-    );
+              ],
+            )),
+      );
+    });
   }
 
   @override

@@ -50,8 +50,8 @@ class DayEvents extends StatelessWidget {
                                   backgroundColor: Colors.red[900],
                                   foregroundColor: Colors.white),
                               onPressed: () {
-                                calendarState.removeEvent(
-                                    currentDate, events[index]);
+                                // calendarState.removeEvent(
+                                //     currentDate, events[index]);
                                 Navigator.of(context).pop();
                               },
                               child: const Text('Delete'),
@@ -68,8 +68,8 @@ class DayEvents extends StatelessWidget {
                                 if (controller.text.isEmpty) {
                                   return;
                                 }
-                                calendarState.updateEvent(currentDate,
-                                    events[index], controller.text);
+                                // calendarState.updateEvent(currentDate,
+                                //     events[index], controller.text);
                                 Navigator.of(context).pop();
                               },
                             ),

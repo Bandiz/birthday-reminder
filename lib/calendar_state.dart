@@ -6,19 +6,20 @@ import 'package:hive/hive.dart';
 import 'models/event.dart';
 
 class CalendarState extends ChangeNotifier {
-  late final Box<Event> _eventsBox;
+  late final Box<EventObject> _eventsBox;
   late final LinkedHashMap<DateTime, List<Event>> _dateEvents =
       LinkedHashMap<DateTime, List<Event>>();
 
-  CalendarState(Box<Event> eventsBox) {
+  CalendarState(Box<EventObject> eventsBox) {
     _eventsBox = eventsBox;
 
     int year = DateTime.now().year;
 
-    for (final Event event in _eventsBox.values) {
-      DateTime key = DateTime.utc(year, event.date.month, event.date.day);
-      _dateEvents.putIfAbsent(key, () => <Event>[]);
-      _dateEvents[key]!.add(event);
+    for (final kv in _eventsBox.toMap().entries) {
+      final Event event = kv.value.getEvent(kv.key);
+      DateTime normalizedDate = event.getNormalizedDate(year);
+      _dateEvents.putIfAbsent(normalizedDate, () => <Event>[]);
+      _dateEvents[normalizedDate]!.add(event);
     }
   }
 
@@ -31,34 +32,56 @@ class CalendarState extends ChangeNotifier {
     return List.unmodifiable(thisMonthEventDates);
   }
 
+  EventObject getEvent(int id) {
+    final event = _eventsBox.get(id);
+
+    if (event == null) {
+      throw Exception("Event does not exist");
+    }
+    return event;
+  }
+
   List<Event> getEvents(DateTime date) =>
       List.unmodifiable(_dateEvents[date] ?? []);
 
-  void addEvent(DateTime date, String title) {
-    final normalizedDay = DateTime.utc(date.year, date.month, date.day);
-    final events = _dateEvents[normalizedDay] ?? [];
-    final id =
-        events.fold(0, (curr, next) => curr < next.id ? next.id : curr) + 1;
-    final newEvent = Event(id: id, title: title, date: normalizedDay);
-    events.add(newEvent);
-    _dateEvents[normalizedDay] = events;
+  void addEvent(DateTime date, String title) async {
+    EventObject newEventObject = EventObject(date: date, title: title);
 
-    _eventsBox.add(newEvent);
-    newEvent.save();
+    final int id = await _eventsBox.add(newEventObject);
+    final Event event = newEventObject.getEvent(id);
+    final DateTime normalizedDate = event.getNormalizedDate();
+
+    _dateEvents[normalizedDate] ??= [];
+    _dateEvents[normalizedDate]!.add(event);
+
+    newEventObject.save();
     notifyListeners();
   }
 
-  void removeEvent(DateTime date, Event event) {
+  void removeEvent(DateTime date, EventObject event) {
     final events = _dateEvents[date] ?? [];
     events.remove(event);
+    // _eventsBox.delete(event.id);
     notifyListeners();
   }
 
-  void updateEvent(DateTime date, Event event, String title) {
-    final events = _dateEvents[date] ?? [];
-    final index = events.indexOf(event);
-    events.replaceRange(
-        index, index + 1, [Event(id: event.id, date: date, title: title)]);
+  void updateEvent(int key, String title, DateTime date) {
+    final EventObject inMemory = _eventsBox.get(key)!;
+    final Event eventSnapshot = inMemory.getEvent(key);
+    final Event updatedEvent = Event(id: key, title: title, birthDate: date);
+
+    final EventObject updatedEventObject = updatedEvent.getEventObject();
+    _eventsBox.put(key, updatedEvent.getEventObject());
+    // updatedEventObject.save();
+
+    _dateEvents[eventSnapshot.getNormalizedDate()]!
+        .removeWhere((x) => x.id == key);
+
+    final DateTime updatedNormalizedDate = updatedEvent.getNormalizedDate();
+
+    _dateEvents[updatedNormalizedDate] ??= [];
+    _dateEvents[updatedNormalizedDate]!.add(updatedEvent);
+
     notifyListeners();
   }
 

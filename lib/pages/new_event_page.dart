@@ -93,7 +93,7 @@ class _NewEventPageState extends State<NewEventPage> {
               TextField(
                 controller: _controller,
                 decoration: const InputDecoration(
-                  labelText: "Enter name",
+                  labelText: "Event name",
                 ),
               ),
               TextButton(

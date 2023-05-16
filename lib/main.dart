@@ -11,11 +11,11 @@ import 'models/event.dart';
 import 'pages/home_page.dart';
 
 void main() async {
-  Hive.registerAdapter(EventAdapter());
+  Hive.registerAdapter(EventObjectAdapter());
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
 
-  final Box<Event> eventsBox = await Hive.openBox<Event>("events");
+  final Box<EventObject> eventsBox = await Hive.openBox<EventObject>("events");
   final Cron cron = Cron();
   final CalendarState state = CalendarState(eventsBox);
 
