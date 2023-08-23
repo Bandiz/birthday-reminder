@@ -45,7 +45,7 @@ Future<void> scheduleReminders(CalendarState state) async {
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
-  final futureEventsDates = state.futureEventDates;
+  final futureEventsDates = state.getMonthEvents;
   final local = tz.getLocation("Europe/Stockholm");
 
   await flutterLocalNotificationsPlugin.cancelAll();

@@ -2,7 +2,6 @@ import 'package:birthday_reminder/pages/calendar_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 import '../calendar_state.dart';
 import 'edit_event_page.dart';
@@ -23,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<CalendarState>(builder: (context, state, child) {
-      final events = state.getEvents(_focusedDay);
+      final events = state.getUpcomingEvents();
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

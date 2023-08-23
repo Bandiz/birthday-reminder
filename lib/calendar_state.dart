@@ -23,7 +23,7 @@ class CalendarState extends ChangeNotifier {
     }
   }
 
-  List<DateTime> get futureEventDates {
+  List<DateTime> get getMonthEvents {
     final dateNow = DateTime.now();
     final thisMonthEventDates = _dateEvents.keys
         .where((x) => (x.month == dateNow.month && x.day >= dateNow.day))
@@ -43,6 +43,17 @@ class CalendarState extends ChangeNotifier {
 
   List<Event> getEvents(DateTime date) =>
       List.unmodifiable(_dateEvents[date] ?? []);
+
+  List<Event> getUpcomingEvents() {
+    final dateNow = DateTime.now();
+    final upcomingEvents = _dateEvents.entries
+        .where(
+            (x) => (x.key.month >= dateNow.month && x.key.day >= dateNow.day))
+        .map((e) => e.value)
+        .expand((element) => element);
+
+    return List.unmodifiable(upcomingEvents);
+  }
 
   void addEvent(DateTime date, String title) async {
     EventObject newEventObject = EventObject(date: date, title: title);
