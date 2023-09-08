@@ -1,11 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../calendar_state.dart';
-import '../models/event.dart';
 import '../constants.dart';
+import '../models/event.dart';
 import 'edit_event_page.dart';
 import 'new_event_page.dart';
 
@@ -51,18 +50,6 @@ class _CalendarPageState extends State<CalendarPage> {
       return Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
-            actions: <Widget>[
-              ...(kDebugMode
-                  ? [
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          state.clear();
-                        },
-                      )
-                    ]
-                  : [])
-            ],
           ),
           body: Column(
             children: [
