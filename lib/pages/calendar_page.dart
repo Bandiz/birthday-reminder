@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../calendar_state.dart';
 import '../constants.dart';
 import '../models/event.dart';
+import '../widgets/event_list.dart';
 import 'edit_event_page.dart';
 import 'new_event_page.dart';
 
@@ -71,29 +72,16 @@ class _CalendarPageState extends State<CalendarPage> {
                 },
               ),
               Expanded(
-                  child: ListView.builder(
-                      itemCount: events.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 8),
-                            child: ListTile(
-                              title: Text(events[index].title),
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditEventPage(
-                                        eventId: events[index].id),
-                                  ),
-                                );
-                              },
-                            ));
+                  child: EventList(
+                      events: events,
+                      onTap: (event) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditEventPage(eventId: event.id),
+                          ),
+                        );
                       }))
             ],
           ),

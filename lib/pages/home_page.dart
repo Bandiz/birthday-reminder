@@ -1,10 +1,13 @@
+import 'dart:math';
+
+import 'package:intl/intl.dart';
 import 'package:birthday_reminder/pages/calendar_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
 
 import '../calendar_state.dart';
+import '../widgets/event_list.dart';
 import 'edit_event_page.dart';
 import 'new_event_page.dart';
 
@@ -39,13 +42,13 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
-          actions: <Widget>[
+          actions: [
             ...(kDebugMode
                 ? [
                     IconButton(
                       icon: const Icon(Icons.add_box),
                       onPressed: () {
-                        generateRandomEvents(state, 50, 2023, 9);
+                        generateRandomEvents(state, 20, 2023, 9);
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -76,61 +79,56 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           children: [
             Expanded(
-                child: ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 2, horizontal: 8),
-                          child: ListTile(
-                            title: Text(events[index].title),
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                  color: Colors.black, width: 1),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditEventPage(eventId: events[index].id),
-                                ),
-                              );
-                            },
-                          ));
+                child: EventList(
+                    events: events,
+                    onTap: (event) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditEventPage(eventId: event.id),
+                        ),
+                      );
                     }))
           ],
         ),
         persistentFooterAlignment: AlignmentDirectional.center,
         persistentFooterButtons: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewEventPage(focusedDate: _focusedDay),
-                ),
-              );
-            },
-            child: const Icon(Icons.add_outlined),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CalendarPage(
-                      title: "Calendar",
-                    ),
-                  ));
-            },
-            child: const Icon(Icons.calendar_month_outlined),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Icon(Icons.person_2_outlined),
-          )
+          Container(
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              NewEventPage(focusedDate: _focusedDay),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.add_outlined),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CalendarPage(
+                              title: "Calendar",
+                            ),
+                          ));
+                    },
+                    child: const Icon(Icons.calendar_month_outlined),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Icon(Icons.person_2_outlined),
+                  )
+                ],
+              ))
         ],
       );
     });

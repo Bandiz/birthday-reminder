@@ -45,12 +45,20 @@ class CalendarState extends ChangeNotifier {
       List.unmodifiable(_dateEvents[date] ?? []);
 
   List<Event> getUpcomingEvents() {
-    final dateNow = DateTime.now();
+    DateTime now = DateTime.now();
+    DateTime minDate = now.add(const Duration(days: -3));
+    DateTime maxDate = now.add(const Duration(days: 7));
+
     final upcomingEvents = _dateEvents.entries
-        .where(
-            (x) => (x.key.month >= dateNow.month && x.key.day >= dateNow.day))
+        .where((event) =>
+            minDate.month <= event.key.month &&
+            event.key.month <= maxDate.month &&
+            minDate.day <= event.key.day &&
+            event.key.day < maxDate.day)
         .map((e) => e.value)
-        .expand((element) => element);
+        .expand((element) => element)
+        .toList();
+    upcomingEvents.sort((a, b) => a.birthDate.isBefore(b.birthDate) ? 0 : 1);
 
     return List.unmodifiable(upcomingEvents);
   }
