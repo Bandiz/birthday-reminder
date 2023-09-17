@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:intl/intl.dart';
 import 'package:birthday_reminder/pages/calendar_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

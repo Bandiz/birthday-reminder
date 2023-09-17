@@ -9,6 +9,7 @@ class CalendarState extends ChangeNotifier {
   late final Box<EventObject> _eventsBox;
   late final LinkedHashMap<DateTime, List<Event>> _dateEvents =
       LinkedHashMap<DateTime, List<Event>>();
+  final List<int> _dismissed = [];
 
   CalendarState(Box<EventObject> eventsBox) {
     _eventsBox = eventsBox;
@@ -54,13 +55,22 @@ class CalendarState extends ChangeNotifier {
             minDate.month <= event.key.month &&
             event.key.month <= maxDate.month &&
             minDate.day <= event.key.day &&
-            event.key.day < maxDate.day)
+            event.key.day < maxDate.day &&
+            event.value.any((x) => !_dismissed.contains(x.id)))
         .map((e) => e.value)
-        .expand((element) => element)
+        .expand((x) => x)
         .toList();
     upcomingEvents.sort((a, b) => a.birthDate.isBefore(b.birthDate) ? 0 : 1);
 
     return List.unmodifiable(upcomingEvents);
+  }
+
+  void dismissEvent(Event event) {
+    if (_dismissed.contains(event.id)) {
+      return;
+    }
+    _dismissed.add(event.id);
+    notifyListeners();
   }
 
   void addEvent(DateTime date, String title) async {
@@ -107,6 +117,7 @@ class CalendarState extends ChangeNotifier {
   void clear() {
     _dateEvents.clear();
     _eventsBox.clear();
+    _dismissed.clear();
     notifyListeners();
   }
 }
