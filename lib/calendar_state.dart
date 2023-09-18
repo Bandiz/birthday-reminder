@@ -55,10 +55,10 @@ class CalendarState extends ChangeNotifier {
             minDate.month <= event.key.month &&
             event.key.month <= maxDate.month &&
             minDate.day <= event.key.day &&
-            event.key.day < maxDate.day &&
-            event.value.any((x) => !_dismissed.contains(x.id)))
+            event.key.day < maxDate.day)
         .map((e) => e.value)
         .expand((x) => x)
+        .where((event) => !_dismissed.contains(event.id))
         .toList();
     upcomingEvents.sort((a, b) => a.birthDate.isBefore(b.birthDate) ? 0 : 1);
 
