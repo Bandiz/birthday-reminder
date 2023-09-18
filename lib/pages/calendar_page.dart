@@ -19,19 +19,15 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  DateTime _focusedDay = DateTime.now();
+  late DateTime _focusedDay;
   DateTime? _selectedDay;
 
   @override
   void initState() {
     super.initState();
-
+    DateTime now = DateTime.now();
+    _focusedDay = DateTime.utc(now.year, now.month, now.day);
     _selectedDay = _focusedDay;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -71,6 +67,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   _focusedDay = focusedDay;
                 },
               ),
+              const SizedBox(height: 20),
               Expanded(
                   child: EventList(
                       events: events,
